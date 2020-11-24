@@ -1,0 +1,464 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>3.JVM学习-内存结构-运行时数据区</title><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 40px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+@media screen and (max-width: 500px) { 
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.7); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px !important; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { padding-left: 32px; padding-right: 32px; padding-bottom: 0px; break-after: avoid; }
+  .typora-export #write::after { height: 0px; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) { 
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="mermaid"] svg, [lang="flow"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom-width: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+svg[id^="mermaidChart"] { line-height: 1em; }
+mark { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); background-position: initial initial; background-repeat: initial initial; }
+.md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
+mark .md-meta { color: rgb(0, 0, 0); opacity: 0.3 !important; }
+
+
+/* 全局属性 */
+#write {
+  max-width: 860px;
+  font-size: 16px;
+  color: black;
+  padding: 0 10px;
+  line-height: 1.6;
+  word-spacing: 0px;
+  letter-spacing: 0px;
+  word-break: break-word;
+  word-wrap: break-word;
+  text-align: left;
+  font-family: Optima-Regular, Optima, PingFangSC-light, PingFangTC-light, 'PingFang SC', Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+/*段落*/
+#write p {
+  font-size: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin: 0;
+  line-height: 26px;
+  color: black;
+}
+
+
+/*标题*/
+#write h1,
+#write h2,
+#write h3,
+#write h4,
+#write h5,
+#write h6 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  padding: 0px;
+  font-weight: bold;
+  color: black;
+}
+#write h1 {
+  font-size: 1.5rem;
+}
+#write h2 {
+  font-size: 1.3rem;
+  border-bottom: 2px solid rgb(239, 112, 96);
+}
+#write h2 span {
+ display: inline-block;
+ font-weight: bold;
+ background: rgb(239, 112, 96);
+ color: #ffffff;
+ padding: 3px 10px 1px;
+ border-top-right-radius: 3px;
+ border-top-left-radius: 3px;
+ margin-right: 3px;
+}
+#write h2:after {
+ display: inline-block;
+ content: "";
+ vertical-align: bottom;
+ border-bottom: 36px solid #efebe9;
+ border-right: 20px solid transparent;
+}
+#write h3 {
+  font-size: 1.2rem;
+}
+#write h4 {
+  font-size: 1.1rem;
+}
+#write h5 {
+  font-size: 1rem;
+}
+#write h6 {
+  font-size: 1rem;
+}
+
+/*列表*/
+#write ul,
+#write ol {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-left: 25px;
+  color: black;
+}
+#write ul {
+  list-style-type: disc;
+}
+#write ul ul {
+  list-style-type: square;
+}
+#write ol {
+  list-style-type: decimal;
+}
+#write li section {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  line-height: 26px;
+  text-align: left;
+  color: rgb(1,1,1); /* 只要是纯黑色微信编辑器就会把color这个属性吞掉。。。*/
+  font-weight: 500;
+}
+
+/*引用*/
+#write blockquote {
+  display: block;
+  font-size: 0.9em;
+  overflow: auto;
+  overflow-scrolling: touch;
+  border-left: 3px solid rgb(239, 112, 96);
+  color: #6a737d;
+  padding: 10px 10px 10px 20px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  background: #fff9f9;
+}
+#write blockquote p {
+  margin: 0px;
+  color: black;
+  line-height: 26px;
+}
+
+/*链接*/
+#write a {
+  text-decoration: none;
+  word-wrap: break-word;
+  font-weight: bold;
+  border-bottom: 1px solid #1e6bb8;
+  color: rgb(239, 112, 96);
+  border-bottom: 1px solid rgb(239, 112, 96);
+}
+
+/*行内代码*/
+#write p code,
+#write li code {
+  font-size: 14px;
+  word-wrap: break-word;
+  padding: 2px 4px;
+  border-radius: 4px;
+  margin: 0 2px;
+  color:  rgb(239, 112, 96);;
+  background-color: rgba(27,31,35,.05);
+  font-family: Operator Mono, Consolas, Monaco, Menlo, monospace;
+  word-break: break-all;
+}
+
+/*图片*/
+#write img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+/*表格*/
+#write table {
+  display: table;
+  text-align: left;
+}
+#write tbody {
+  border: 0;
+}
+#write table tr {
+  border: 0;
+  border-top: 1px solid #ccc;
+  background-color: white;
+}
+#write table tr:nth-child(2n) {
+  background-color: #F8F8F8;
+}
+#write table tr th,
+#write table tr td {
+  font-size: 16px;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  text-align: left;
+}
+#write table tr th {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+
+/* 行内代码 */
+#write span code, #write li code {
+ color: rgb(239, 112, 96);
+}
+
+/* 脚注上标 */
+#write .md-footnote {
+ font-weight: bold;
+ color: rgb(239, 112, 96);
+}
+#write .md-footnote > .md-text:before {
+ content: '['
+}
+#write .md-footnote > .md-text:after {
+ content: ']'
+}
+
+/* 脚注 */
+#write .md-def-name {
+  padding-right: 1.8ch;
+}
+#write .md-def-name:before {
+  content: '[';
+  color: #000;
+}
+#write .md-def-name:after {
+  color: #000;
+}
+
+/* 代码块主题 */
+.md-fences:before {
+  content: ' ';
+  display: block;
+  width: 100%;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-color: #282c34;
+  margin-bottom: -7px;
+  border-radius: 5px;
+  background-position: 10px 10px;
+}
+.cm-s-inner.CodeMirror {
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+  background-color: #292d3e;
+  color: #a6accd;
+  font-family: Consolas;
+  border-radius: 4px;
+}
+.CodeMirror-lines {
+  padding-left: 4px;
+}
+.cm-s-inner .cm-keyword {
+  color: #c792ea;
+}
+.cm-s-inner .cm-operator {
+  color: #89ddff;
+}
+.cm-s-inner .cm-variable-2 {
+  color: #eeffff;
+}
+.cm-s-inner .cm-variable-3,
+.cm-s-inner .cm-type {
+  color: #f07178;
+}
+.cm-s-inner .cm-builtin {
+  color: #ffcb6b;
+}
+.cm-s-inner .cm-atom {
+  color: #f78c6c;
+}
+.cm-s-inner .cm-number {
+  color: #ff5370;
+}
+.cm-s-inner .cm-def {
+  color: #82aaff;
+}
+.cm-s-inner .cm-string {
+  color: #c3e88d;
+}
+.cm-s-inner .cm-string-2 {
+  color: #f07178;
+}
+.cm-s-inner .cm-comment {
+  color: #676e95;
+}
+.cm-s-inner .cm-variable {
+  color: #f07178;
+}
+.cm-s-inner .cm-tag {
+  color: #ff5370;
+}
+.cm-s-inner .cm-meta {
+  color: #ffcb6b;
+}
+.cm-s-inner .cm-attribute {
+  color: #c792ea;
+}
+.cm-s-inner .cm-property {
+  color: #c792ea;
+}
+.cm-s-inner .cm-qualifier {
+  color: #decb6b;
+}
+.cm-s-inner .cm-variable-3,
+.cm-s-inner .cm-type {
+  color: #decb6b;
+}
+.cm-s-inner .cm-error {
+  color: rgba(255, 255, 255, 1);
+  background-color: #ff5370;
+}
+.cm-s-inner .CodeMirror-matchingbracket {
+  text-decoration: underline;
+  color: white !important;
+}
+.CodeMirror div.CodeMirror-cursor {
+  border-left: 1px solid rgb(239, 112, 96);
+  z-index: 3;
+}
+
+
+
+</style>
+</head>
+<body class='typora-export' >
+<div  id='write'  class = 'is-mac'><h1><a name="jvm学习-内存结构" class="md-header-anchor"></a><span>JVM学习-内存结构</span></h1><h2><a name="jvm运行时数据区" class="md-header-anchor"></a><span>JVM运行时数据区</span></h2><p><img src="/Users/shiyuesheng/Desktop/java技术笔记/Jvm虚拟机/图片/JVM运行时数据区.jpg" alt="JVM运行时数据区" style="zoom:40%;" /></p><p><em><span>简要描述：</span></em></p><h3><a name="程序计数器" class="md-header-anchor"></a><strong><span>程序计数器</span></strong></h3><ul><li><span>记录正在执行的虚拟机字节码指令地址</span></li><li><span>字节码解释器通过改变计数器，选取下一条字节码指令，是程序流程的控制器</span></li><li><span>线程上下文切换时，记录、恢复现场</span></li><li><span>线程私有，生命周期与线程相同</span></li><li><span>没有规定OutOfMemoryError</span></li></ul><h3><a name="java虚拟机栈" class="md-header-anchor"></a><strong><span>Java虚拟机栈</span></strong></h3><ul><li><span>线程运行的内存模型，每调用一个方法，压入一个栈帧</span></li><li><span>栈帧存放局部变量表、操作数栈、动态链接、方法出口信息</span></li><li><span>栈帧大小编译期确定</span></li><li><span>线程上下文切换时，记录、恢复现场</span></li><li><span>线程私有，生命周期与线程相同</span></li><li><span>线程私有，所以线程安全</span></li><li><span>StackOverflowError 、OutOfMemoryError</span></li><li><span>方法内的局部变量，如果是原生数据类型，存放的栈帧上；如果是对象引用，则栈帧上存放的是引用地址，而对象本身存放在堆上。</span></li></ul><h3><a name="本地方法栈--略～" class="md-header-anchor"></a><strong><span>本地方法栈</span></strong><span>  略～</span></h3><h3><a name="java堆" class="md-header-anchor"></a><strong><span>Java堆</span></strong></h3><ul><li><span>几乎所有的对象都存储在堆中</span></li><li><span>虚拟机启动时创建</span></li><li><span>线程共享，所以存在对象内存分配的同步问题，TLAB 线程内存分配缓冲优化</span></li><li><span>垃圾回收主要场所</span></li><li><span>无法分配新的内存，且无法扩展时 OutOfMemoryError</span></li></ul><h3><a name="方法区" class="md-header-anchor"></a><strong><span>方法区</span></strong></h3><ul><li><span>用于存储虚拟机加载的类型信息、常量、静态常量、即时编译器编译后的代码缓存等数据</span></li><li><span>元数据空间实现</span></li><li><span>线程共享</span></li><li><span>运行时常量池、CCS 压缩指针</span></li></ul><h3><a name="直接内存" class="md-header-anchor"></a><strong><span>直接内存</span></strong></h3><ul><li><p><span>堆外内存，这个第方一直心存疑惑，这块内存到底是在用户态、还是在内核态？</span></p></li><li><p><span>线上进行JVM内存参数配置的时候，要考虑这部分的内存的使用大小，避免出现配置的虚拟机内存接近或者超过物理内存，尤其是使用netty io框架的时候。一般这块内存可以保持跟堆内存大小一致。</span></p><p><em><span>上一张JVM内存全景图，有些花花绿绿</span></em></p><p><img src="/Users/shiyuesheng/Desktop/java技术笔记/Jvm虚拟机/图片/JVM内存全景图.jpg" alt="JVM内存全景图" style="zoom:80%;" /></p></li></ul><h2><a name="程序计数器-program-counter-register" class="md-header-anchor"></a><span>程序计数器 (Program Counter Register)</span></h2><p><span>	</span><span>程序计数器(Program Counter Register)是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。在Java虚拟机的概念模型里[1]，</span><strong><span>字节码解释器工作时就是通过改变这个计数器 的值来选取下一条需要执行的字节码指令，它是程序控制流的指示器，分支、循环、跳转、异常处 理、线程恢复等基础功能都需要依赖这个计数器来完成。</span></strong></p><p><span>	</span><span>由于Java虚拟机的多线程是通过线程轮流切换、分配处理器执行时间的方式来实现的，在任何一 个确定的时刻，一个处理器(对于多核处理器来说是一个内核)都只会执行一条线程中的指令。</span><strong><span>因 此，为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器，各条线程 之间计数器互不影响，独立存储，我们称这类内存区域为“线程私有”的内存</span></strong><span>。</span></p><p><span>	</span><span>如果线程正在执行的是一个Java方法，这个计数器记录的是正在执行的虚拟机字节码指令的地 址;如果正在执行的是本地(N at ive)方法，这个计数器值则应为空(U ndefined)。</span><strong><span>此内存区域是唯 一一个在《Java虚拟机规范》中没有规定任何OutOfMemoryError情况的区域。</span></strong></p><h2><a name="java虚拟机栈-java-virtual-machine-stack" class="md-header-anchor"></a><span>Java虚拟机栈 (Java Virtual Machine Stack)</span></h2><p><span>	</span><span>Java虚拟机栈(Java Virtual Machine Stack)是</span><strong><span>线程私有</span></strong><span>的，它的</span><strong><span>生命周期与线程相同</span></strong><span>。虚拟机栈描述的是Java方法执行的线程内存模型：</span><strong><span>每个方法被执行的时候，Java虚拟机栈都会同步创建一个栈帧(Stack Frame)用于存储局部变量表、操作数栈、动态链接、方法出口等信息</span></strong><span>。</span><strong><span>每一个方法被调用直至执行完毕的过程，就对应着一个栈帧在虚拟机栈中从入栈到出栈的过程。</span></strong></p><p><span>	</span><span>局部变量表存放了编译期可知的各种Java虚拟机</span><strong><span>基本类型</span></strong><span>（boolean、byte、char、short、int、float、long、double）、</span><strong><span>对象引用</span></strong><span>（reference类型）、和</span><strong><span>returenAddress</span></strong><span>（指向一条字节码指令）类型。</span></p><p><span>	</span><span>这些数据类型在局部变量表中的存储空间以局部变量槽（Slot）来表示，long、double类型数据占用两个槽位，其余数据类型占用1个。</span><strong><span>局部变量表所需的内存空间在编译期间完成分配，当进入一个方法时，这个方法需要在栈帧中分配多大的局部变量空间时完全确定的</span></strong><span>。</span></p><p><span>	</span><span>《Java虚拟机规范》对这个内存区域规定了两类异常情况：如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果Java虚拟机栈容量可以动态扩展，当栈扩展时无法申请到足够的内存会抛出OutofMemoryError异常。</span></p><p><span>	</span><span>HotSpot虚拟机的栈容量是不可以动态扩容的，所以在HotSpot虚拟机上是不会由于虚拟机栈无法扩展而导致OutOfMemoryError异常。但是如果在申请栈空间时，因为内存不足而申请失败，还是会抛出OutOfMemoryError异常。</span></p><h2><a name="本地方法栈native-method-stacks" class="md-header-anchor"></a><span>本地方法栈(Native Method Stacks)</span></h2><p><span>	</span><span>本地方法栈(Native Method Stacks)与虚拟机栈发挥的作用相似，区别在于虚拟机栈为虚拟机执行Java方法（字节码）服务，而本地方法栈则是为虚拟机使用的本地（Native）方法服务。</span></p><p><span>	</span><strong><span>HosSpot虚拟机已经把虚拟机栈、本地方法栈合二为一。</span></strong></p><h2><a name="java堆java-heap" class="md-header-anchor"></a><span>Java堆(Java Heap)</span></h2><p><span>	</span><span>Java堆(Java Heap)是被所有线程共享的一块内存区域，在虚拟机启动时创建。所有的对象实例以及数组都应该在这里分配内存。以G1垃圾收集器为界限，Java虚拟机的堆内存布局，可以使用新生代，老年代，永久代，Eden，Survivor等来描述。</span></p><p><span>	</span><span>内存分配缓冲区TLAB(Thread Local Allocation Buffer)，这个是线程私有的，目的是因为虚拟机分配对象的内存时要保证内存资源的安全，多线程的情况下必然会有同步的问题，线程私有的内存分配缓冲区可以绕过这个同步问题，提升对象分配时的效率。线程的生命周期中所使用的内存大小，可以作为TLAB的经验参考值。当超出TLAB大小限制时，还是会存在对象内存分配的同步问题。</span></p><p><span>	</span><span>内存分配参数 -Xmx:最大内存， -Xms:最小内存，若果Java堆中没有内存可以分配，并且无法再扩展了，抛出OutOfMemoryError异常。</span></p><h2><a name="方法区method-area" class="md-header-anchor"></a><span>方法区(Method Area)</span></h2><p><span>	</span><span>方法区(Method Area)是线程共享区域，用于存储虚拟机加载的类型信息、常量、静态常量、即时编译器编译后的代码缓存等数据。《Java虚拟机规范》中把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫做“非堆”(Non-Heap)，目的是与Java堆区分开来。</span></p><p><span>	</span><span>永久代(Permanent)，HotSpot以前使用永久代来实现方法区，目的是为了不用为方法区实现垃圾收集器，这样可以向管理堆内存一样管理方法区。永久代空间有默认上限，-XX:MaxPermSize 可以设置上限。这块区域会遇到内存溢出问题。</span></p><p><span>	</span><span>JDK8彻底废弃了永久代，方法区在本地内存(Native Memory)实现元空间(Meta-space)。</span></p><p><span>	</span><span>方法区的内存回收目标主要是针对常量池、对类型的卸载。但是回收效果很难“令人满意”。</span></p><h3><a name="运行时常量池runtime-constant-pool" class="md-header-anchor"></a><span>运行时常量池(Runtime Constant Pool)</span></h3><p><span>	</span><span>运行时常量池(Runtime Constant Pool)是方法区的一部分。Class文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池表(Constant Pool Table)，用于存放编译期生成的各种字面量与符号引用，这部分内容再类加载后存放到方法区的运行时常量池中。</span></p><p><span>	</span><span>运行时常量池跟Class文件常量池表是不同的概念。</span></p><ul><li><span>Class的格式有严格的规定，当然常量池表也是如此。</span></li></ul><ul><li><span>运行时常量池具有动态性，并不是只有Class文件常量池表的数据能够进入运行时常量池，运行期间也可以将新的常量放入其中。面试中令人头疼的 String类的intern()方法。</span></li><li><span>当运行时常量池无法申请到内存时，抛出OutOfMemoryError异常。</span></li></ul><h3><a name="ccs压缩指针--略～" class="md-header-anchor"></a><span>CCS压缩指针  略～</span></h3><h2><a name="直接内存direct-memory" class="md-header-anchor"></a><span>直接内存(Direct Memory)</span></h2><p><span>	</span><span>直接内存(Direct Memory)并不是虚拟机运行时数据去的一部分。也不是《Java虚拟机规范》中定义的内存区域。这是这块区域的使用也会导致OutOfMemoryError异常。</span></p><p><span>	</span><span>JDK1.4加入了NIO，引入了一种基于通道(Channel)与缓冲区(Buffer)的I/O方式，可以使用Native函数库直接分配堆外内存，然后通过一个存储在Java堆里面的DirectByteBuffer对象作为这块内存的引用进行操作。这样在一些场景中能够显著提高性能，因为避免了在Java堆和Native堆中来回复制数据。</span></p><p><span>	</span><strong><span>问题来了，直接内存是怎么回收的呢？DirectByteBuffer与虚幻引用是如何配合的呢？</span></strong></p><p><span>	</span><span>本机直接内存的分配不会受到Java堆大小的限制，但是既然是内存，还是会受到本机总内存大小的限制，一般服务器管理员配置虚拟机参数时，会根据实际内存去设置-Xmx等参数信息，但经常忽略掉直接内存，使得各个内存区域总和大于物理内存限制，从而导致动态扩容时出现OutOfMemoryError异常。</span></p><p>&nbsp;</p><blockquote><p><span>参考资料：</span></p><ol><li><span>《深入理解Java虚拟机（第三版）》-周志明</span></li></ol></blockquote><p>&nbsp;</p></div>
+</body>
+</html>
