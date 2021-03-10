@@ -23,11 +23,11 @@ GenericBeanDefinition
 
 ## 5、Spring Bean Class加载阶段
 
-6、Spring Bean 实例化前阶段
+## 6、Spring Bean 实例化前阶段
 
-7、Spring Bean 实例化阶段
+## 7、Spring Bean 实例化阶段
 
-8、Spring Bean 实例化后阶段
+## 8、Spring Bean 实例化后阶段
 
 9、Spring Bean 属性赋值阶段
 
